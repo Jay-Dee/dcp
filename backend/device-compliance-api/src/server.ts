@@ -1,19 +1,17 @@
 import express from "express";
 import pinoHttp from "pino-http";
 import { logger } from "./logger.js";
+import { healthRoutes } from "./routes/healthcheck.routes.js";
+import { deviceRoutes } from "./routes/device.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
 app.use(pinoHttp({ logger }));
 
-app.get("/health", (_req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "device-compliance-api",
-    timestamp: new Date().toISOString()
-  });
-});
+app.use("/health", healthRoutes);
+app.use("/api/device", deviceRoutes);
 
 app.listen(PORT, () => {
   logger.info(

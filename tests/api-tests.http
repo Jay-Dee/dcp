@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:3000
+
+###
+# Health Check
+
+GET {{baseUrl}}/health
+
+###
+
+# Compliant Device
+
+POST http://localhost:3000/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "macbook-001",
+  "platform": "macOS",
+  "diskEncrypted": true,
+  "antivirusRunning": true,
+  "lastPatchedDays": 1
+}
+
+###
+
+# Non-Compliant Device
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "macbook-002",
+  "platform": "macOS",
+  "diskEncrypted": false,
+  "antivirusRunning": true,
+  "lastPatchedDays": 12
+}
