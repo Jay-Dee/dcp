@@ -1,0 +1,22 @@
+{
+  "name": "device-compliance-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pino": "^9.7.0",
+    "pino-http": "^10.5.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.0",
+    "pino-pretty": "^13.1.1",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}

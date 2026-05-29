@@ -1,37 +1,30 @@
-# Device Compliance Platform
+# Endpoint Compliance & Automation Platform
 
-Enterprise-style endpoint compliance and remediation platform built with:
+Cloud-native endpoint compliance platform built to simulate the operational tooling used by endpoint engineering and platform teams.
 
-- React
-- Node.js
-- Python
-- AWS CDK
-- LocalStack
-- Docker
+The platform receives device compliance check-ins, evaluates security policies, triggers automated remediation workflows, and records audit activity.
 
-This project simulates cloud-native operational tooling used by internal platform and endpoint engineering teams to monitor device compliance, automate remediation workflows, and provide operational visibility across managed environments.
+The project demonstrates:
+
+* AWS cloud development
+* Event-driven architecture
+* Infrastructure as Code
+* Operational automation
+* Security-focused workflows
+* Platform engineering concepts
 
 ---
 
-# Overview
+# Technology Stack
 
-The platform simulates enterprise device management workflows by:
-
-- Receiving device health/compliance check-ins
-- Evaluating compliance policies
-- Triggering remediation workflows
-- Recording audit activity
-- Displaying operational dashboards
-
-The project is designed to demonstrate:
-
-- Cloud engineering
-- Infrastructure as Code
-- Event-driven architecture
-- Operational automation
-- Security-focused workflows
-- CI/CD readiness
-- Platform engineering concepts
+| Layer          | Technology         |
+| -------------- | ------------------ |
+| Frontend       | React + TypeScript |
+| Backend API    | Node.js + Express  |
+| Automation     | Python             |
+| Infrastructure | AWS CDK            |
+| AWS Simulation | LocalStack         |
+| Containers     | Docker Compose     |
 
 ---
 
@@ -41,24 +34,37 @@ The project is designed to demonstrate:
 ┌─────────────────────┐
 │ React Dashboard     │
 └─────────┬───────────┘
-          ↓
+          │
+          ▼
 ┌─────────────────────┐
 │ Node.js API         │
-│ - Device ingestion  │
-│ - Compliance checks │
+│ - Device Check-In   │
+│ - Compliance Engine │
 └─────────┬───────────┘
-          ↓
+          │
+          ▼
 ┌─────────────────────┐
-│ LocalStack AWS      │
-│ - DynamoDB          │
-│ - EventBridge       │
-│ - SQS               │
+│ DynamoDB            │
+│ Device Records      │
 └─────────┬───────────┘
-          ↓
+          │
+          ▼
+┌─────────────────────┐
+│ EventBridge         │
+│ Compliance Events   │
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│ SQS                 │
+│ Remediation Queue   │
+└─────────┬───────────┘
+          │
+          ▼
 ┌─────────────────────┐
 │ Python Worker       │
 │ - Remediation       │
-│ - Audit logging     │
+│ - Audit Logging     │
 └─────────────────────┘
 ```
 
@@ -68,12 +74,14 @@ The project is designed to demonstrate:
 
 ## Device Check-In API
 
-Simulated enterprise devices submit status reports:
+Managed devices submit compliance reports.
+
+Example:
 
 ```json
 {
   "deviceId": "macbook-001",
-  "os": "macOS",
+  "platform": "macOS",
   "diskEncrypted": false,
   "antivirusRunning": true,
   "lastPatchedDays": 12
@@ -84,77 +92,123 @@ Simulated enterprise devices submit status reports:
 
 ## Compliance Engine
 
-Evaluates security policies such as:
+The API evaluates incoming device reports against security policies.
 
-- Disk encryption enabled
-- Antivirus running
-- Patch age within policy threshold
+### Compliance Rules
 
-Example violations:
-
-- Encryption disabled
-- Outdated patch level
-- Missing endpoint protection
+| Rule                          | Severity |
+| ----------------------------- | -------- |
+| Disk encryption disabled      | High     |
+| Antivirus disabled            | High     |
+| Patch age greater than 7 days | Medium   |
 
 ---
 
 ## Event-Driven Remediation
 
-Non-compliant devices trigger automated remediation workflows using:
+Non-compliant devices trigger automated remediation workflows.
 
-- EventBridge
-- SQS
-- Python remediation workers
+Workflow:
 
-Example remediation actions:
+```txt
+Device Check-In
+        ↓
+Compliance Evaluation
+        ↓
+Violation Detected
+        ↓
+Event Published
+        ↓
+Remediation Queued
+        ↓
+Audit Event Recorded
+```
 
-- Queue remediation task
-- Generate audit event
-- Raise operational alert
+The workflow is implemented using:
+
+* EventBridge
+* SQS
+* Python remediation workers
+
+---
+
+## Audit Logging
+
+All automated remediation actions generate audit records.
+
+Example:
+
+```json
+{
+  "timestamp": "2026-05-29T12:00:00Z",
+  "deviceId": "macbook-001",
+  "action": "REMEDIATION_QUEUED",
+  "actor": "automation-worker"
+}
+```
 
 ---
 
 ## Operational Dashboard
 
-React dashboard displaying:
+The React dashboard provides visibility into platform activity.
 
-- Compliance status
-- Active alerts
-- Device inventory
-- Remediation activity
-- Risk levels
+### Fleet Summary
+
+* Total devices
+* Compliant devices
+* Non-compliant devices
+
+### Device Inventory
+
+* Device ID
+* Platform
+* Compliance status
+
+### Active Remediations
+
+* Device
+* Violation
+* Status
+
+---
+
+## Structured Logging
+
+The platform uses structured JSON logging to support operational troubleshooting and auditability.
+
+Example:
+
+```json
+{
+  "event": "compliance_violation",
+  "deviceId": "macbook-001",
+  "rule": "DISK_ENCRYPTION",
+  "severity": "HIGH"
+}
+```
 
 ---
 
 ## Infrastructure as Code
 
-AWS infrastructure defined using CDK:
+AWS resources are provisioned using AWS CDK.
 
-- DynamoDB tables
-- EventBridge rules
-- SQS queues
-- IAM permissions
+Infrastructure includes:
 
----
+* DynamoDB
+* EventBridge
+* SQS
+* IAM permissions
 
-# Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React + TypeScript |
-| Backend API | Node.js + Express |
-| Automation | Python |
-| Infrastructure | AWS CDK |
-| AWS Simulation | LocalStack |
-| Containers | Docker Compose |
-| CI/CD | GitHub Actions / GitLab CI |
+Local AWS services are provided using LocalStack.
 
 ---
 
 # Project Structure
 
 ```txt
-device-compliance-platform/
+endpoint-compliance-platform/
 │
 ├── frontend/
 ├── backend/
@@ -171,31 +225,29 @@ device-compliance-platform/
 
 ## Requirements
 
-- Docker
-- Node.js
-- Python
-- AWS CDK CLI
+* Docker
+* Node.js
+* Python
+* AWS CDK CLI
 
 ---
 
-# Running the Platform
-
-## 1. Start services
+## Start Services
 
 ```bash
 docker compose up
 ```
 
-Starts:
+This starts:
 
-- React frontend
-- Node.js API
-- Python worker
-- LocalStack
+* React frontend
+* Node.js API
+* Python worker
+* LocalStack
 
 ---
 
-## 2. Deploy infrastructure
+## Deploy Infrastructure
 
 ```bash
 cd infrastructure
@@ -203,18 +255,18 @@ npm install
 cdk deploy
 ```
 
-Deploys local AWS infrastructure into LocalStack.
+Deploys AWS resources into LocalStack.
 
 ---
 
-## 3. Submit a simulated device check-in
+## Submit a Device Check-In
 
 ```bash
 curl -X POST http://localhost:3000/api/device/checkin \
 -H "Content-Type: application/json" \
 -d '{
   "deviceId":"macbook-001",
-  "os":"macOS",
+  "platform":"macOS",
   "diskEncrypted":false,
   "antivirusRunning":true,
   "lastPatchedDays":12
@@ -223,81 +275,42 @@ curl -X POST http://localhost:3000/api/device/checkin \
 
 ---
 
-# Example Workflow
+# CI Pipeline
+
+The project includes a basic CI pipeline that validates code quality before deployment.
+
+Pipeline stages:
 
 ```txt
-Device Check-In
-        ↓
-Compliance Evaluation
-        ↓
-Violation Detected
-        ↓
-Event Published
-        ↓
-Remediation Worker Triggered
-        ↓
-Audit Event Recorded
-        ↓
-Dashboard Updated
+Lint
+ ↓
+Test
+ ↓
+Build
 ```
 
 ---
 
-# Compliance Rules
-
-| Rule | Severity |
-|---|---|
-| Disk encryption disabled | High |
-| Antivirus disabled | High |
-| Patch age > 7 days | Medium |
-
----
-
-# Audit Logging
-
-All remediation actions generate audit records.
-
-Example:
-
-```json
-{
-  "timestamp": "2026-05-29T12:00:00Z",
-  "deviceId": "macbook-001",
-  "action": "REMEDIATION_QUEUED",
-  "actor": "automation-worker"
-}
-```
-
----
-
-# Goals
+# Project Goals
 
 This project focuses on demonstrating:
 
-- Enterprise cloud architecture
-- Infrastructure automation
-- Event-driven systems
-- Operational support tooling
-- Security-focused engineering workflows
-- Platform engineering practices
+* Cloud-native development
+* AWS services and Infrastructure as Code
+* Event-driven systems
+* Operational automation
+* Endpoint compliance workflows
+* Platform engineering practices
 
 ---
 
 # Future Improvements
 
-- Authentication and RBAC
-- Real-time dashboard updates
-- Metrics and observability
-- Scheduled compliance scans
-- Device risk scoring
-- Slack / Teams integrations
-- Deployment environments (dev/staging/prod)
-
----
-
-# Screenshots
-
-_Add dashboard and infrastructure screenshots here._
+* Additional compliance policies
+* Dashboard visualisations
+* Scheduled compliance scans
+* Deployment environments
+* Expanded remediation workflows
 
 ---
 
