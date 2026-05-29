@@ -16,3 +16,14 @@ export interface ComplianceResult {
   status: "COMPLIANT" | "NON_COMPLIANT";
   violations: ComplianceViolation[];
 }
+
+export interface DeviceRecord {
+  deviceId: string;
+  platform: string;
+  diskEncrypted: boolean;
+  antivirusRunning: boolean;
+  lastPatchedDays: number;
+  status: "COMPLIANT" | "NON_COMPLIANT";
+  violations: ComplianceViolation[];
+  checkedInAt: string;
+}

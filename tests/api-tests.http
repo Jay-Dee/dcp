@@ -6,10 +6,9 @@
 GET {{baseUrl}}/health
 
 ###
+# Submit Compliant Device Check-In
 
-# Compliant Device
-
-POST http://localhost:3000/api/device/checkin
+POST {{baseUrl}}/api/device/checkin
 Content-Type: application/json
 
 {
@@ -17,20 +16,48 @@ Content-Type: application/json
   "platform": "macOS",
   "diskEncrypted": true,
   "antivirusRunning": true,
-  "lastPatchedDays": 1
+  "lastPatchedDays": 2
 }
 
 ###
-
-# Non-Compliant Device
+# Submit Non-Compliant Device Check-In
 
 POST {{baseUrl}}/api/device/checkin
 Content-Type: application/json
 
 {
   "deviceId": "macbook-002",
-  "platform": "macOS",
+  "platform": "Windows",
   "diskEncrypted": false,
   "antivirusRunning": true,
   "lastPatchedDays": 12
 }
+
+###
+# Submit High-Risk Non-Compliant Device Check-In
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "macbook-003",
+  "platform": "macOS",
+  "diskEncrypted": false,
+  "antivirusRunning": false,
+  "lastPatchedDays": 30
+}
+
+###
+# Get All Device Records
+
+GET {{baseUrl}}/api/device
+
+###
+# Get Single Device Record
+
+GET {{baseUrl}}/api/device/macbook-002
+
+###
+# Get Missing Device Record
+
+GET {{baseUrl}}/api/device/unknown-device
