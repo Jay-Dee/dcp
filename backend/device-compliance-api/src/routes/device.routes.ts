@@ -1,9 +1,11 @@
 import { Router } from "express";
+import crypto from "node:crypto";
 
 import { logger } from "../logger.js";
 import { saveDeviceRecord, getAllDeviceRecords, getDeviceRecord } from "../repositories/device.repository.js";
 import { evaluateCompliance } from "../services/compliance.service.js";
 import { DeviceCheckIn, DeviceRecord } from "../types/device.js";
+import { saveAuditEvent } from "../repositories/audit.repository.js";
 
 export const deviceRoutes = Router();
 
@@ -25,6 +27,15 @@ deviceRoutes.post("/checkin", (req, res) => {
   };
 
   saveDeviceRecord(record);
+  saveAuditEvent({
+  auditId: crypto.randomUUID(),
+  timestamp: new Date().toISOString(),
+  deviceId: record.deviceId,
+  action: "COMPLIANCE_EVALUATED",
+  actor: "device-compliance-api",
+  status: record.status,
+  violationCount: record.violations.length
+});
 
   logger.info(
     {

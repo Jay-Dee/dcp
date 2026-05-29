@@ -61,3 +61,8 @@ GET {{baseUrl}}/api/device/macbook-002
 # Get Missing Device Record
 
 GET {{baseUrl}}/api/device/unknown-device
+
+###
+# Get Audit Events
+
+GET {{baseUrl}}/api/audit
