@@ -54,8 +54,8 @@ function App() {
     <main className="page">
       <header className="header">
         <div>
-          <p className="eyebrow">Device Endpoint Compliance Dashboard</p>
-          <h1>Device Endpoint Compliance Dashboard</h1>
+          <p className="eyebrow">Operational Dashboard</p>
+          <h1>Endpoint Device Compliance Dashboard</h1>
         </div>
       </header>
 

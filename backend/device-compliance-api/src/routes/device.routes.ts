@@ -1,10 +1,9 @@
 import { Router } from "express";
+import { deviceRepository } from "../container";
 
-import {
-  getAllDeviceRecords,
-  getDeviceRecord} from "../repositories/device.repository";
+
 import { deviceCheckInSchema } from "../schemas/device.schema";
-import { processDeviceCheckIn } from "../services/device.service";
+import { deviceCheckInService } from "../services/device.service";
 
 export const deviceRoutes = Router();
 
@@ -17,17 +16,17 @@ deviceRoutes.post("/checkin", (req, res) => {
     });
   }
 
-  const record = processDeviceCheckIn(validation.data);
+  const record = deviceCheckInService.processDeviceCheckIn(validation.data);
 
   return res.status(200).json(record);
 });
 
 deviceRoutes.get("/", (_req, res) => {
-  return res.status(200).json(getAllDeviceRecords());
+  return res.status(200).json(deviceRepository.getAll());
 });
 
 deviceRoutes.get("/:deviceId", (req, res) => {
-  const record = getDeviceRecord(req.params.deviceId);
+  const record = deviceRepository.getById(req.params.deviceId);
 
   if (!record) {
     return res.status(404).json({

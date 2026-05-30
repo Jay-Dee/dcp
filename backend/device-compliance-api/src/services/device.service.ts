@@ -1,22 +1,22 @@
 import crypto from "node:crypto";
-
-import { saveAuditEvent } from "../repositories/audit.repository";
-import {
-  saveDeviceRecord
-} from "../repositories/device.repository";
-import { appendEvent } from "../repositories/event.repository";
-
+import { DeviceRepository } from "../repositories/interfaces/device-repository";
+import { AuditRepository } from "../repositories/interfaces/audit-repository";
+import { EventStoreRepository } from "../repositories/interfaces/event-repository";
+import { DeviceCheckIn, DeviceRecord } from "../types/device";
 import { evaluateCompliance } from "./compliance.service";
+import { auditRepository, deviceRepository, eventRepository } from "../container";
 
-import type { DeviceCheckIn, DeviceRecord } from "../types/device";
+export class DeviceCheckInService {
+  constructor(
+    private readonly deviceRepository: DeviceRepository,
+    private readonly auditRepository: AuditRepository,
+    private readonly eventStoreRepository: EventStoreRepository
+  ) {}
+  
+  processDeviceCheckIn(checkIn: DeviceCheckIn): DeviceRecord {
+    const checkedInAt = new Date().toISOString();
 
-export function processDeviceCheckIn(
-  checkIn: DeviceCheckIn
-): DeviceRecord {
-
-  const checkedInAt = new Date().toISOString();
-
-  appendEvent({
+  this.eventStoreRepository.append({
     eventId: crypto.randomUUID(),
     eventType: "DEVICE_CHECKED_IN",
     aggregateId: checkIn.deviceId,
@@ -34,9 +34,9 @@ export function processDeviceCheckIn(
     checkedInAt
   };
 
-  saveDeviceRecord(record);
+  this.deviceRepository.save(record);
 
-  const auditEvent = saveAuditEvent({
+  const auditEvent = this.auditRepository.save({
     auditId: crypto.randomUUID(),
     timestamp: new Date().toISOString(),
     deviceId: record.deviceId,
@@ -46,7 +46,7 @@ export function processDeviceCheckIn(
     violationCount: record.violations.length
   });
 
-  appendEvent({
+  this.eventStoreRepository.append({
     eventId: crypto.randomUUID(),
     eventType: "COMPLIANCE_EVALUATED",
     aggregateId: record.deviceId,
@@ -58,7 +58,7 @@ export function processDeviceCheckIn(
     }
   });
 
-  appendEvent({
+  this.eventStoreRepository.append({
     eventId: crypto.randomUUID(),
     eventType: "AUDIT_EVENT_CREATED",
     aggregateId: auditEvent.auditId,
@@ -68,4 +68,12 @@ export function processDeviceCheckIn(
   });
 
   return record;
+  }
 }
+
+export const deviceCheckInService = new DeviceCheckInService(
+  deviceRepository,
+  auditRepository,
+  eventRepository
+);
+
