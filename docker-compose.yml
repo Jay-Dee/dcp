@@ -1,0 +1,56 @@
+services:
+  device-compliance-api:
+    image: node:22-alpine
+    container_name: device-compliance-api
+
+    working_dir: /app
+
+    volumes:
+      - ./backend/device-compliance-api:/app
+
+    command: sh -c "npm install && npm run dev"
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      LOG_LEVEL: debug
+
+  frontend:
+    image: node:22-alpine
+    container_name: device-compliance-dashboard
+
+    working_dir: /app
+
+    volumes:
+      - ./frontend:/app
+
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+    ports:
+      - "5173:5173"
+
+    environment:
+      NODE_ENV: development
+      VITE_API_BASE_URL: http://localhost:3000
+
+    depends_on:
+      - device-compliance-api
+
+#   localstack:
+#     image: localstack/localstack:4.4.0
+#     container_name: dcp-localstack
+#     ports:
+#       - "4566:4566"
+#     environment:
+#       - SERVICES=s3,sqs,dynamodb
+#       - DEBUG=1
+#       - AWS_DEFAULT_REGION=eu-west-2
+#       - AWS_ACCESS_KEY_ID=test
+#       - AWS_SECRET_ACCESS_KEY=test
+
+# volumes:
+#     localstack_data:
+  

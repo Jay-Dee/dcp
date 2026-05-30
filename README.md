@@ -1,306 +1,69 @@
 # Device Compliance Platform
 
-Enterprise-style endpoint compliance and remediation platform built with:
+[![CI](https://github.com/Jay-Dee/dcp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Jay-Dee/dcp/actions/workflows/ci.yml)
 
-- React
-- Node.js
-- Python
-- AWS CDK
-- LocalStack
-- Docker
+A local-first endpoint compliance and operational visibility platform.
 
-This project simulates cloud-native operational tooling used by internal platform and endpoint engineering teams to monitor device compliance, automate remediation workflows, and provide operational visibility across managed environments.
+The project simulates how an endpoint engineering or platform team might receive device compliance check-ins, evaluate security policy status, record audit activity, and expose operational data through a read-only dashboard.
+
+The current MVP is intentionally minimal and can be run entirely locally without a cloud account.
 
 ---
 
-# Overview
+## Current MVP Scope
 
-The platform simulates enterprise device management workflows by:
+The current implementation includes:
 
-- Receiving device health/compliance check-ins
-- Evaluating compliance policies
-- Triggering remediation workflows
-- Recording audit activity
-- Displaying operational dashboards
-
-The project is designed to demonstrate:
-
-- Cloud engineering
-- Infrastructure as Code
-- Event-driven architecture
-- Operational automation
-- Security-focused workflows
-- CI/CD readiness
-- Platform engineering concepts
-
----
-
-# Architecture
-
-```txt
-┌─────────────────────┐
-│ React Dashboard     │
-└─────────┬───────────┘
-          ↓
-┌─────────────────────┐
-│ Node.js API         │
-│ - Device ingestion  │
-│ - Compliance checks │
-└─────────┬───────────┘
-          ↓
-┌─────────────────────┐
-│ LocalStack AWS      │
-│ - DynamoDB          │
-│ - EventBridge       │
-│ - SQS               │
-└─────────┬───────────┘
-          ↓
-┌─────────────────────┐
-│ Python Worker       │
-│ - Remediation       │
-│ - Audit logging     │
-└─────────────────────┘
-```
+- Node.js + TypeScript compliance API
+- React + TypeScript read-only dashboard
+- Device check-in endpoint
+- Compliance evaluation engine
+- Zod request validation
+- In-memory device repository
+- In-memory audit repository
+- In-memory event store
+- Dashboard summary endpoint
+- Structured logging with Pino
+- Docker Compose development environment
+- VS Code `.http` API test requests
+- Unit tests for core compliance workflow
+- Initial CI build/test workflow
 
 ---
 
-# Features
+## Technology Stack
 
-## Device Check-In API
-
-Simulated enterprise devices submit status reports:
-
-```json
-{
-  "deviceId": "macbook-001",
-  "os": "macOS",
-  "diskEncrypted": false,
-  "antivirusRunning": true,
-  "lastPatchedDays": 12
-}
-```
-
----
-
-## Compliance Engine
-
-Evaluates security policies such as:
-
-- Disk encryption enabled
-- Antivirus running
-- Patch age within policy threshold
-
-Example violations:
-
-- Encryption disabled
-- Outdated patch level
-- Missing endpoint protection
-
----
-
-## Event-Driven Remediation
-
-Non-compliant devices trigger automated remediation workflows using:
-
-- EventBridge
-- SQS
-- Python remediation workers
-
-Example remediation actions:
-
-- Queue remediation task
-- Generate audit event
-- Raise operational alert
-
----
-
-## Operational Dashboard
-
-React dashboard displaying:
-
-- Compliance status
-- Active alerts
-- Device inventory
-- Remediation activity
-- Risk levels
-
----
-
-## Infrastructure as Code
-
-AWS infrastructure defined using CDK:
-
-- DynamoDB tables
-- EventBridge rules
-- SQS queues
-- IAM permissions
-
----
-
-# Tech Stack
-
-| Layer | Technology |
+| Area | Technology |
 |---|---|
-| Frontend | React + TypeScript |
-| Backend API | Node.js + Express |
-| Automation | Python |
-| Infrastructure | AWS CDK |
-| AWS Simulation | LocalStack |
-| Containers | Docker Compose |
-| CI/CD | GitHub Actions / GitLab CI |
+| Frontend | React, TypeScript, Vite |
+| Backend API | Node.js, Express, TypeScript |
+| Validation | Zod |
+| Logging | Pino, pino-http |
+| Testing | Vitest |
+| Local Runtime | Docker Compose |
+| Future IaC | AWS CDK |
+| Future Local Cloud Simulation | LocalStack |
 
 ---
 
-# Project Structure
+## Architecture
 
 ```txt
-device-compliance-platform/
-│
-├── frontend/
-├── backend/
-├── worker/
-├── infrastructure/
-├── docker/
-├── docs/
-└── docker-compose.yml
-```
-
----
-
-# Local Development
-
-## Requirements
-
-- Docker
-- Node.js
-- Python
-- AWS CDK CLI
-
----
-
-# Running the Platform
-
-## 1. Start services
-
-```bash
-docker compose up
-```
-
-Starts:
-
-- React frontend
-- Node.js API
-- Python worker
-- LocalStack
-
----
-
-## 2. Deploy infrastructure
-
-```bash
-cd infrastructure
-npm install
-cdk deploy
-```
-
-Deploys local AWS infrastructure into LocalStack.
-
----
-
-## 3. Submit a simulated device check-in
-
-```bash
-curl -X POST http://localhost:3000/api/device/checkin \
--H "Content-Type: application/json" \
--d '{
-  "deviceId":"macbook-001",
-  "os":"macOS",
-  "diskEncrypted":false,
-  "antivirusRunning":true,
-  "lastPatchedDays":12
-}'
-```
-
----
-
-# Example Workflow
-
-```txt
-Device Check-In
-        ↓
-Compliance Evaluation
-        ↓
-Violation Detected
-        ↓
-Event Published
-        ↓
-Remediation Worker Triggered
-        ↓
-Audit Event Recorded
-        ↓
-Dashboard Updated
-```
-
----
-
-# Compliance Rules
-
-| Rule | Severity |
-|---|---|
-| Disk encryption disabled | High |
-| Antivirus disabled | High |
-| Patch age > 7 days | Medium |
-
----
-
-# Audit Logging
-
-All remediation actions generate audit records.
-
-Example:
-
-```json
-{
-  "timestamp": "2026-05-29T12:00:00Z",
-  "deviceId": "macbook-001",
-  "action": "REMEDIATION_QUEUED",
-  "actor": "automation-worker"
-}
-```
-
----
-
-# Goals
-
-This project focuses on demonstrating:
-
-- Enterprise cloud architecture
-- Infrastructure automation
-- Event-driven systems
-- Operational support tooling
-- Security-focused engineering workflows
-- Platform engineering practices
-
----
-
-# Future Improvements
-
-- Authentication and RBAC
-- Real-time dashboard updates
-- Metrics and observability
-- Scheduled compliance scans
-- Device risk scoring
-- Slack / Teams integrations
-- Deployment environments (dev/staging/prod)
-
----
-
-# Screenshots
-
-_Add dashboard and infrastructure screenshots here._
-
----
-
-# License
-
-MIT
+Device / API Test Client
+        |
+        v
+Node.js Compliance API
+        |
+        v
+Device Check-In Service
+        |
+        +--> Compliance Engine
+        |
+        +--> Device Repository
+        |
+        +--> Audit Repository
+        |
+        +--> Event Store Repository
+        |
+        v
+React Read-Only Dashboard

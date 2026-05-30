@@ -1,0 +1,97 @@
+@baseUrl = http://localhost:3000
+
+###
+# Health Check
+
+GET {{baseUrl}}/health
+
+###
+# Submit Compliant Device Check-In
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "macbook-001",
+  "platform": "macOS",
+  "diskEncrypted": true,
+  "antivirusRunning": true,
+  "lastPatchedDays": 2
+}
+
+###
+# Submit Non-Compliant Device Check-In
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "macbook-002",
+  "platform": "Windows",
+  "diskEncrypted": false,
+  "antivirusRunning": true,
+  "lastPatchedDays": 12
+}
+
+###
+# Submit High-Risk Non-Compliant Device Check-In
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "macbook-003",
+  "platform": "macOS",
+  "diskEncrypted": false,
+  "antivirusRunning": false,
+  "lastPatchedDays": 30
+}
+
+###
+# Get All Device Records
+
+GET {{baseUrl}}/api/device
+
+###
+# Get Single Device Record
+
+GET {{baseUrl}}/api/device/macbook-002
+
+###
+# Get Missing Device Record
+
+GET {{baseUrl}}/api/device/unknown-device
+
+###
+# Get Audit Events
+
+GET {{baseUrl}}/api/audit
+
+###
+# Get Event Store
+
+GET {{baseUrl}}/api/events
+
+###
+# Get Events For Device
+
+GET {{baseUrl}}/api/events/macbook-002
+
+###
+# Invalid Device Check-In
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "",
+  "platform": "macOS",
+  "diskEncrypted": "no",
+  "antivirusRunning": true,
+  "lastPatchedDays": -5
+}
+
+###
+# Get Dashboard Summary
+
+GET {{baseUrl}}/api/summary
