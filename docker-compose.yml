@@ -38,3 +38,19 @@ services:
 
     depends_on:
       - device-compliance-api
+
+  localstack:
+    image: localstack/localstack:4.4.0
+    container_name: dcp-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,sqs,dynamodb
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=eu-west-2
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+
+volumes:
+    localstack_data:
+  
