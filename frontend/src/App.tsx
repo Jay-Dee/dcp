@@ -1,24 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
-import { getAuditEvents, getDevices } from "./api";
-import type { AuditEvent, DeviceRecord } from "./types";
+import { getAuditEvents, getDevices, getEvents } from "./api";
+import type { AuditEvent, DeviceRecord, DomainEvent } from "./types";
 import "./App.css";
 
 function App() {
   const [devices, setDevices] = useState<DeviceRecord[]>([]);
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [events, setEvents] = useState<DomainEvent[]>([]);
 
   async function loadDashboard() {
     try {
       setError(null);
 
-      const [deviceData, auditData] = await Promise.all([
+      const [deviceData, auditData, eventData] = await Promise.all([
         getDevices(),
-        getAuditEvents()
+        getAuditEvents(),
+        getEvents(),
       ]);
 
       setDevices(deviceData);
       setAuditEvents(auditData);
+      setEvents(eventData);
     } catch {
       setError("Unable to load dashboard data");
     }
@@ -35,7 +38,7 @@ function App() {
     return {
       total: devices.length,
       compliant,
-      nonCompliant
+      nonCompliant,
     };
   }, [devices]);
 
@@ -124,6 +127,32 @@ function App() {
           <p className="empty">No audit events recorded yet.</p>
         )}
       </section>
+
+      <section className="panel">
+        <h2>Event Store</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Event Type</th>
+              <th>Aggregate</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.eventId}>
+                <td>{new Date(event.timestamp).toLocaleString()}</td>
+                <td>{event.eventType}</td>
+                <td>{event.aggregateId}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {events.length === 0 && <p className="empty">No events recorded.</p>}
+      </section>
     </main>
   );
 }
@@ -138,7 +167,11 @@ function SummaryCard(props: { label: string; value: number }) {
 }
 
 function StatusBadge(props: { status: DeviceRecord["status"] }) {
-  return <span className={`badge ${props.status.toLowerCase()}`}>{props.status}</span>;
+  return (
+    <span className={`badge ${props.status.toLowerCase()}`}>
+      {props.status}
+    </span>
+  );
 }
 
 export default App;

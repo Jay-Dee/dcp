@@ -23,3 +23,12 @@ export interface AuditEvent {
   status: "COMPLIANT" | "NON_COMPLIANT";
   violationCount: number;
 }
+
+export interface DomainEvent {
+  eventId: string;
+  eventType: string;
+  aggregateId: string;
+  aggregateType: string;
+  timestamp: string;
+  payload: Record<string, unknown>;
+}
