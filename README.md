@@ -1,5 +1,7 @@
 # Device Compliance Platform
 
+[![CI](https://github.com/Jay-Dee/dcp/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Jay-Dee/dcp/actions/workflows/ci.yml)
+
 A local-first endpoint compliance and operational visibility platform.
 
 The project simulates how an endpoint engineering or platform team might receive device compliance check-ins, evaluate security policy status, record audit activity, and expose operational data through a read-only dashboard.
