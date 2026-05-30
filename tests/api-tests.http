@@ -90,3 +90,8 @@ Content-Type: application/json
   "antivirusRunning": true,
   "lastPatchedDays": -5
 }
+
+###
+# Get Dashboard Summary
+
+GET {{baseUrl}}/api/summary
