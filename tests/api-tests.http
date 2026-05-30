@@ -66,3 +66,13 @@ GET {{baseUrl}}/api/device/unknown-device
 # Get Audit Events
 
 GET {{baseUrl}}/api/audit
+
+###
+# Get Event Store
+
+GET {{baseUrl}}/api/events
+
+###
+# Get Events For Device
+
+GET {{baseUrl}}/api/events/macbook-002
