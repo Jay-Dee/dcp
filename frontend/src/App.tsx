@@ -54,14 +54,9 @@ function App() {
     <main className="page">
       <header className="header">
         <div>
-          <p className="eyebrow">Endpoint Platform</p>
-          <h1>Compliance Dashboard</h1>
-          <p className="subtitle">
-            Local MVP for device compliance monitoring and audit visibility.
-          </p>
+          <p className="eyebrow">Device Endpoint Compliance Dashboard</p>
+          <h1>Device Endpoint Compliance Dashboard</h1>
         </div>
-
-        <button onClick={loadDashboard}>Refresh</button>
       </header>
 
       {error && <section className="error">{error}</section>}
