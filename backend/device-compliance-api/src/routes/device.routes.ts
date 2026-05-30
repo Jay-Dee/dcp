@@ -1,24 +1,43 @@
-import { Router } from "express";
 import crypto from "node:crypto";
+import { Router } from "express";
 
-import { logger } from "../logger.js";
-import { saveDeviceRecord, getAllDeviceRecords, getDeviceRecord } from "../repositories/device.repository.js";
-import { evaluateCompliance } from "../services/compliance.service.js";
-import { DeviceCheckIn, DeviceRecord } from "../types/device.js";
-import { saveAuditEvent } from "../repositories/audit.repository.js";
+import { logger } from "../logger";
+import { saveAuditEvent } from "../repositories/audit.repository";
+import {
+  getAllDeviceRecords,
+  getDeviceRecord,
+  saveDeviceRecord
+} from "../repositories/device.repository";
 import { appendEvent } from "../repositories/event.repository";
+import { deviceCheckInSchema } from "../schemas/device.schema";
+import { evaluateCompliance } from "../services/compliance.service";
+import type { DeviceRecord } from "../types/device";
 
 export const deviceRoutes = Router();
 
 deviceRoutes.post("/checkin", (req, res) => {
-  if (!req.body) {
+  const validation = deviceCheckInSchema.safeParse(req.body);
+
+  if (!validation.success) {
+    logger.warn(
+      {
+        event: "device_checkin_validation_failed",
+        issues: validation.error.issues
+      },
+      "Invalid device check-in payload"
+    );
+
     return res.status(400).json({
-      error: "Request body is required"
+      error: "Invalid device check-in payload",
+      details: validation.error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message
+      }))
     });
   }
 
+  const checkIn = validation.data;
   const checkedInAt = new Date().toISOString();
-  const checkIn = req.body as DeviceCheckIn;
 
   appendEvent({
     eventId: crypto.randomUUID(),
@@ -26,23 +45,10 @@ deviceRoutes.post("/checkin", (req, res) => {
     aggregateId: checkIn.deviceId,
     aggregateType: "DEVICE",
     timestamp: checkedInAt,
-    payload: checkIn as unknown as Record<string, unknown>
+    payload: checkIn
   });
 
   const result = evaluateCompliance(checkIn);
-
-  appendEvent({
-    eventId: crypto.randomUUID(),
-    eventType: "COMPLIANCE_EVALUATED",
-    aggregateId: checkIn.deviceId,
-    aggregateType: "DEVICE",
-    timestamp: new Date().toISOString(),
-    payload: {
-      status: result.status,
-      violations: result.violations,
-      violationCount: result.violations.length
-    }
-  });
 
   const record: DeviceRecord = {
     ...checkIn,
@@ -61,6 +67,19 @@ deviceRoutes.post("/checkin", (req, res) => {
     actor: "device-compliance-api",
     status: record.status,
     violationCount: record.violations.length
+  });
+
+  appendEvent({
+    eventId: crypto.randomUUID(),
+    eventType: "COMPLIANCE_EVALUATED",
+    aggregateId: record.deviceId,
+    aggregateType: "DEVICE",
+    timestamp: new Date().toISOString(),
+    payload: {
+      status: result.status,
+      violations: result.violations,
+      violationCount: result.violations.length
+    }
   });
 
   appendEvent({
@@ -93,7 +112,9 @@ deviceRoutes.get("/:deviceId", (req, res) => {
   const record = getDeviceRecord(req.params.deviceId);
 
   if (!record) {
-    return res.status(404).json({ error: "Device not found" });
+    return res.status(404).json({
+      error: "Device not found"
+    });
   }
 
   return res.status(200).json(record);

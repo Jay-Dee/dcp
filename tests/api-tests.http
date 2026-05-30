@@ -76,3 +76,17 @@ GET {{baseUrl}}/api/events
 # Get Events For Device
 
 GET {{baseUrl}}/api/events/macbook-002
+
+###
+# Invalid Device Check-In
+
+POST {{baseUrl}}/api/device/checkin
+Content-Type: application/json
+
+{
+  "deviceId": "",
+  "platform": "macOS",
+  "diskEncrypted": "no",
+  "antivirusRunning": true,
+  "lastPatchedDays": -5
+}
