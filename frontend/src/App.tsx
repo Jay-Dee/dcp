@@ -9,6 +9,14 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<DomainEvent[]>([]);
 
+  useEffect(() => {
+    loadDashboard();
+
+    const interval = setInterval(loadDashboard, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   async function loadDashboard() {
     try {
       setError(null);
